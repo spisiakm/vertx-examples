@@ -12,7 +12,7 @@
     <release.candidate.repository>
       https://maven.repository.redhat.com/ga/
     </release.candidate.repository>
-    <vertx.version>3.5.2.redhat-00001</vertx.version>
+    <vertx.version>3.5.1.redhat-004</vertx.version>
   </properties>
 
   <dependencies>
