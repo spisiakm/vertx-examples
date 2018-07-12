@@ -8,12 +8,19 @@
   <artifactId>core-examples</artifactId>
   <version>3.5.2</version>
 
+  <properties>
+    <release.candidate.repository>
+      https://maven.repository.redhat.com/ga/
+    </release.candidate.repository>
+    <vertx.version>3.5.2.redhat-00001</vertx.version>
+  </properties>
+
   <dependencies>
 
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
-      <version>${project.version}</version>
+      <version>${vertx.version}</version>
     </dependency>
 
     <dependency>
@@ -70,4 +77,32 @@
     </profile>
   </profiles>
 
+  <repositories>
+    <repository>
+      <id>redhat-build</id>
+      <name>Red Hat builds Repository</name>
+      <url>${release.candidate.repository}</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>redhat-build</id>
+      <url>${release.candidate.repository}</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
 </project>
