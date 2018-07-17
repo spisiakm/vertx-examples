@@ -16,6 +16,7 @@ public class Client extends AbstractVerticle {
 
   @Override
   public void start() throws Exception {
+    System.out.println("VERTX version: "+vertx.getClass().getPackage().getImplementationVersion() + "!!!!!!!!");
     vertx.createNetClient().connect(1234, "localhost", res -> {
 
       if (res.succeeded()) {
