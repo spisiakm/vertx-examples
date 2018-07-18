@@ -5,12 +5,17 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.vertx</groupId>
-
   <artifactId>vertx-examples</artifactId>
-
   <packaging>pom</packaging>
+  <version>3.5.1.redhat-004</version>
 
-  <version>3.5.2</version>
+  <properties>
+    <release.candidate.repository>
+      https://maven.repository.redhat.com/ga/
+    </release.candidate.repository>
+    <vertx.version>${project.version}</vertx.version>
+    <vertx.skip>true</vertx.skip>
+  </properties>
 
   <modules>
     <module>maven-simplest</module>
@@ -40,7 +45,6 @@
     <module>infinispan-examples</module>
     <module>amqp-bridge-examples</module>
     <module>fatjar-examples/http2-fatjar</module>
-    <module>fatjar-examples/ruby-fatjar</module>
     <module>camel-bridge-examples</module>
     <module>osgi-examples</module>
     <module>resteasy-examples</module>
@@ -54,8 +58,50 @@
     <module>zookeeper-examples</module>
   </modules>
 
-  <profiles>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-dependencies</artifactId>
+        <version>${vertx.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.7.0</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>io.reactiverse</groupId>
+        <artifactId>vertx-maven-plugin</artifactId>
+        <version>1.0.15</version>
+        <executions>
+          <execution>
+            <id>vmp</id>
+            <goals>
+              <goal>initialize</goal>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <redeploy>true</redeploy>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
     <profile>
       <id>java9</id>
       <activation>
@@ -71,7 +117,7 @@
       <id>docker</id>
       <activation>
         <property>
-          <name>!skipDocker</name>
+          <name>dockerExamples</name>
         </property>
       </activation>
       <modules>
@@ -81,14 +127,32 @@
         <module>docker-examples/vertx-docker-java-fatjar</module>
       </modules>
     </profile>
-    <profile>
-      <id>staging</id>
-      <repositories>
-        <repository>
-          <id>staging</id>
-          <url>https://oss.sonatype.org/content/repositories/iovertx-3776/</url>
-        </repository>
-      </repositories>
-    </profile>
   </profiles>
+
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>redhat-build</id>
+      <name>Red Hat builds Repository</name>
+      <url>${release.candidate.repository}</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>redhat-build</id>
+      <url>${release.candidate.repository}</url>
+    </pluginRepository>
+  </pluginRepositories>
 </project>
