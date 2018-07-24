@@ -20,12 +20,13 @@ public class JDBCExample extends AbstractVerticle {
   @Override
   public void start() throws Exception {
 
-    final JDBCClient client = JDBCClient.createShared(vertx, new JsonObject()
-        .put("url", "jdbc:hsqldb:mem:test?shutdown=true")
-        .put("driver_class", "org.hsqldb.jdbcDriver")
-        .put("max_pool_size", 30)
-        .put("user", "SA")
-        .put("password", ""));
+    JsonObject config = new JsonObject()
+      .put("jdbcUrl", "jdbc:postgresql://localhost:5432/my_data")
+      .put("driverClassName", "org.postgresql.Driver")
+      .put("principal", "user")
+      .put("credential", "password");
+
+    final JDBCClient client = JDBCClient.createShared(vertx, config);
 
     client.getConnection(conn -> {
       if (conn.failed()) {

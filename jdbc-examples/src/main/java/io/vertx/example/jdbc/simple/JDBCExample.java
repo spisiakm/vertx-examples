@@ -1,14 +1,10 @@
 package io.vertx.example.jdbc.simple;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.example.util.Runner;
 import io.vertx.ext.jdbc.JDBCClient;
-import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 
 /*
@@ -24,12 +20,13 @@ public class JDBCExample extends AbstractVerticle {
   @Override
   public void start() throws Exception {
 
-    final JDBCClient client = JDBCClient.createShared(vertx, new JsonObject()
-        .put("url", "jdbc:hsqldb:mem:test?shutdown=true")
-        .put("driver_class", "org.hsqldb.jdbcDriver")
-        .put("max_pool_size", 30)
-        .put("user", "SA")
-        .put("password", ""));
+    JsonObject config = new JsonObject()
+      .put("jdbcUrl", "jdbc:postgresql://localhost:5432/my_data")
+      .put("driverClassName", "org.postgresql.Driver")
+      .put("principal", "user")
+      .put("credential", "password");
+
+    final JDBCClient client = JDBCClient.createShared(vertx, config);
 
     client.getConnection(conn -> {
       if (conn.failed()) {
