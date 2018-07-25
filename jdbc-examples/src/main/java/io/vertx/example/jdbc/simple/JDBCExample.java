@@ -22,52 +22,62 @@ public class JDBCExample extends AbstractVerticle {
   }
 
   @Override
-  public void start() throws Exception {
+  public void start() {
 
-    startDockerPostgres();
-
-    JsonObject config = new JsonObject()
-      .put("jdbcUrl", "jdbc:postgresql://localhost:5432/" + dbName)
-      .put("driverClassName", "org.postgresql.Driver")
-      .put("principal", dbUser)
-      .put("credential", dbPassword);
-
-    final JDBCClient client = JDBCClient.createShared(vertx, config);
-
-    client.getConnection(conn -> {
-      if (conn.failed()) {
-        System.err.println(conn.cause().getMessage());
-        return;
+    vertx.executeBlocking(future -> {
+      try {
+        startDockerPostgres();
+        future.complete();
+      } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
+        future.fail(e);
       }
+    }, result -> {
+      if (result.succeeded()) {
+        JsonObject config = new JsonObject()
+          .put("jdbcUrl", "jdbc:postgresql://localhost:5432/" + dbName)
+          .put("driverClassName", "org.postgresql.Driver")
+          .put("principal", dbUser)
+          .put("credential", dbPassword);
 
-      final SQLConnection connection = conn.result();
-      connection.execute("create table test(id int primary key, name varchar(255))", res -> {
-        if (res.failed()) {
-          throw new RuntimeException(res.cause());
-        }
-        // insert some test data
-        connection.execute("insert into test values(1, 'Hello')", insert -> {
-          // query some data
-          connection.query("select * from test", rs -> {
-            for (JsonArray line : rs.result().getResults()) {
-              System.out.println(line.encode());
+        final JDBCClient client = JDBCClient.createShared(vertx, config);
+
+        client.getConnection(conn -> {
+          if (conn.failed()) {
+            System.err.println(conn.cause().getMessage());
+            return;
+          }
+
+          final SQLConnection connection = conn.result();
+          connection.execute("create table test(id int primary key, name varchar(255))", res -> {
+            if (res.failed()) {
+              throw new RuntimeException(res.cause());
             }
+            // insert some test data
+            connection.execute("insert into test values(1, 'Hello')", insert -> {
+              // query some data
+              connection.query("select * from test", rs -> {
+                for (JsonArray line : rs.result().getResults()) {
+                  System.out.println(line.encode());
+                }
 
-            // and close the connection
-            connection.close(done -> {
-              if (done.failed()) {
-                throw new RuntimeException(done.cause());
-              }
+                // and close the connection
+                connection.close(done -> {
+                  if (done.failed()) {
+                    throw new RuntimeException(done.cause());
+                  }
 
-              try {
-                stopDockerDatabase();
-              } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-              }
+                  try {
+                    stopDockerDatabase();
+                  } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                  }
+                });
+              });
             });
           });
         });
-      });
+      }
     });
   }
 }

@@ -24,55 +24,65 @@ public class JDBCExample extends AbstractVerticle {
   }
 
   @Override
-  public void start() throws Exception {
+  public void start() {
 
-    startDockerPostgres();
-
-    JsonObject config = new JsonObject()
-      .put("jdbcUrl", "jdbc:postgresql://localhost:5432/" + dbName)
-      .put("driverClassName", "org.postgresql.Driver")
-      .put("principal", dbUser)
-      .put("credential", dbPassword);
-
-    final JDBCClient client = JDBCClient.createShared(vertx, config);
-
-    client.getConnection(conn -> {
-      if (conn.failed()) {
-        System.err.println(conn.cause().getMessage());
-        return;
+    vertx.executeBlocking(future -> {
+      try {
+        startDockerPostgres();
+        future.complete();
+      } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
+        future.fail(e);
       }
+    }, result -> {
+      if (result.succeeded()) {
+        JsonObject config = new JsonObject()
+          .put("jdbcUrl", "jdbc:postgresql://localhost:5432/" + dbName)
+          .put("driverClassName", "org.postgresql.Driver")
+          .put("principal", dbUser)
+          .put("credential", dbPassword);
 
-      // create a test table
-      execute(conn.result(), "create table test(id int primary key, name varchar(255))", create -> {
-        // start a transaction
-        startTx(conn.result(), beginTrans -> {
-          // insert some test data
-          execute(conn.result(), "insert into test values(1, 'Hello')", insert -> {
-            // commit data
-            rollbackTx(conn.result(), rollbackTrans -> {
-              // query some data
-              query(conn.result(), "select count(*) from test", rs -> {
-                for (JsonArray line : rs.getResults()) {
-                  System.out.println(line.encode());
-                }
+        final JDBCClient client = JDBCClient.createShared(vertx, config);
 
-                // and close the connection
-                conn.result().close(done -> {
-                  if (done.failed()) {
-                    throw new RuntimeException(done.cause());
-                  }
+        client.getConnection(conn -> {
+          if (conn.failed()) {
+            System.err.println(conn.cause().getMessage());
+            return;
+          }
 
-                  try {
-                    stopDockerDatabase();
-                  } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
-                  }
+          // create a test table
+          execute(conn.result(), "create table test(id int primary key, name varchar(255))", create -> {
+            // start a transaction
+            startTx(conn.result(), beginTrans -> {
+              // insert some test data
+              execute(conn.result(), "insert into test values(1, 'Hello')", insert -> {
+                // commit data
+                rollbackTx(conn.result(), rollbackTrans -> {
+                  // query some data
+                  query(conn.result(), "select count(*) from test", rs -> {
+                    for (JsonArray line : rs.getResults()) {
+                      System.out.println(line.encode());
+                    }
+
+                    // and close the connection
+                    conn.result().close(done -> {
+                      if (done.failed()) {
+                        throw new RuntimeException(done.cause());
+                      }
+
+                      try {
+                        stopDockerDatabase();
+                      } catch (IOException | InterruptedException e) {
+                        e.printStackTrace();
+                      }
+                    });
+                  });
                 });
               });
             });
           });
         });
-      });
+      }
     });
   }
 
