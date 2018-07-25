@@ -9,6 +9,10 @@ import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 
+import java.io.IOException;
+
+import static io.vertx.example.util.DockerDatabase.*;
+
 /*
  * @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
  */
@@ -22,11 +26,13 @@ public class JDBCExample extends AbstractVerticle {
   @Override
   public void start() throws Exception {
 
+    startDockerPostgres();
+
     JsonObject config = new JsonObject()
-      .put("jdbcUrl", "jdbc:postgresql://localhost:5432/my_data")
+      .put("jdbcUrl", "jdbc:postgresql://localhost:5432/" + dbName)
       .put("driverClassName", "org.postgresql.Driver")
-      .put("principal", "user")
-      .put("credential", "password");
+      .put("principal", dbUser)
+      .put("credential", dbPassword);
 
     final JDBCClient client = JDBCClient.createShared(vertx, config);
 
@@ -54,6 +60,12 @@ public class JDBCExample extends AbstractVerticle {
                 conn.result().close(done -> {
                   if (done.failed()) {
                     throw new RuntimeException(done.cause());
+                  }
+
+                  try {
+                    stopDockerDatabase();
+                  } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
                   }
                 });
               });
