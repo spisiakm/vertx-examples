@@ -39,5 +39,10 @@
       <artifactId>vertx-web-client</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-service-discovery</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>
