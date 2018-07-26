@@ -31,7 +31,8 @@ public class DockerDatabase {
       "-e", "POSTGRES_USER=" + dbUser, "-e", "POSTGRES_PASSWORD=" + dbPassword, "-e", "POSTGRES_DB=" + dbName,
       "-p", "5432:5432", "-d", "postgres");
     Process process = processBuilder.start();
-    if (!process.waitFor(5, TimeUnit.MINUTES) || process.exitValue() != 0) {
+    boolean endedInTime = process.waitFor(5, TimeUnit.MINUTES);
+    if (!endedInTime || process.exitValue() != 0) {
       System.err.println((char) 27 + "[31mA posgres database init has failed!" + (char) 27 + "[0m");
       System.exit(1);
     }
