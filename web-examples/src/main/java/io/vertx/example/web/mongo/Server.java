@@ -4,6 +4,8 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.example.util.DockerDatabase;
+import io.vertx.example.util.DockerDbConfig;
 import io.vertx.example.util.Runner;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.Router;
@@ -34,8 +36,10 @@ public class Server extends AbstractVerticle {
   @Override
   public void start() throws Exception {
 
-    // Create a mongo client using all defaults (connect to localhost and default port) using the database name "demo".
-    final MongoClient mongo = MongoClient.createShared(vertx, new JsonObject().put("db_name", "demo"));
+    DockerDatabase.startDocker(DockerDbConfig.MONGODB);
+
+    // Create a mongo client using all defaults (connect to localhost and default port) using the database name "my_data".
+    final MongoClient mongo = MongoClient.createShared(vertx, new JsonObject().put("db_name", "my_data"));
 
     // In order to use a JADE template we first need to create an engine
     final JadeTemplateEngine jade = JadeTemplateEngine.create();

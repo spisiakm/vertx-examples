@@ -27,10 +27,13 @@ public class DockerDatabase {
 
   public static void startDocker(DockerDbConfig dockerDbConfigConf) throws IOException, InterruptedException {
     DockerDatabase.dockerAppName= dockerDbConfigConf;
-    System.out.println("Starting postgres database through docker...\n");
+    System.out.println("Starting " + dockerDbConfigConf.getDbName() + " database through docker...\n");
+    System.out.println("docker run --name " + dockerDbConfigConf.getDbName() + " -e " + dockerDbConfigConf.getUserEnv() + "=" + dbUser + " -e "
+        + dockerDbConfigConf.getPasswdEnv() + "=" + dbPassword + " -e " + dockerDbConfigConf.getDbNameEnv() + "=" + dbName +
+      " -p " + dockerDbConfigConf.getPort() + ":" + dockerDbConfigConf.getPort() + " -d " + dockerDbConfigConf.getDbName());
     ProcessBuilder processBuilder = new ProcessBuilder("docker", "run", "--name", dockerDbConfigConf.getDbName(),
       "-e", dockerDbConfigConf.getUserEnv() + "=" + dbUser, "-e", dockerDbConfigConf.getPasswdEnv() + "=" + dbPassword, "-e", dockerDbConfigConf.getDbNameEnv() + "=" + dbName,
-      "-p", dockerDbConfigConf.getPort() + ":" + dockerDbConfigConf.getPort(), "-d", dockerDbConfigConf.getDbName());
+      "-p", dockerDbConfigConf.getPort() + ":" + dockerDbConfigConf.getPort(), "-d", dockerDbConfigConf.getDbName() + ":" + dockerDbConfigConf.getContainerVersion());
 
     Process process = processBuilder.start();
     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -51,10 +54,10 @@ public class DockerDatabase {
     String ln;
     int cnt = 0;
     while ((ln = reader.readLine()) != null) {
-//      System.out.println(ln);
-      if (ln.contains("database system is ready to accept connections")) {
+      //System.out.println(ln);
+      if (ln.contains(dockerDbConfigConf.getExceptDeployingResult())) {
         cnt++;
-        if (cnt == 2) {
+        if (dockerDbConfigConf == DockerDbConfig.MONGODB || cnt == 2) {
           p1.destroy();
           System.out.println((char) 27 + "[32mA " + dockerDbConfigConf.getDbName() + " database through docker has been started!" + (char) 27 + "[0m");
           return;

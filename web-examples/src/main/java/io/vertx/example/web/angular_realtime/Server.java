@@ -5,6 +5,8 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.example.util.DockerDatabase;
+import io.vertx.example.util.DockerDbConfig;
 import io.vertx.example.util.Runner;
 import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.shiro.ShiroAuth;
@@ -34,9 +36,10 @@ public class Server extends AbstractVerticle {
 
   @Override
   public void start() throws Exception {
+    DockerDatabase.startDocker(DockerDbConfig.MONGODB);
 
-    // Create a mongo client using all defaults (connect to localhost and default port) using the database name "demo".
-    mongo = MongoClient.createShared(vertx, new JsonObject().put("db_name", "demo"));
+    // Create a mongo client using all defaults (connect to localhost and default port) using the database name "my_data".
+    mongo = MongoClient.createShared(vertx, new JsonObject().put("db_name", "my_data"));
 
     // the load function just populates some data on the storage
     loadData(mongo);
