@@ -4,6 +4,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.example.util.DockerDbConfig;
 import io.vertx.example.util.Runner;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.ResultSet;
@@ -12,6 +13,7 @@ import io.vertx.ext.sql.SQLConnection;
 import java.io.IOException;
 
 import static io.vertx.example.util.DockerDatabase.*;
+import static io.vertx.example.util.DockerDbConfig.*;
 
 /*
  * @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
@@ -28,7 +30,7 @@ public class JDBCExample extends AbstractVerticle {
 
     vertx.executeBlocking(future -> {
       try {
-        startDockerPostgres();
+        startDocker(POSTGRESQL);
         future.complete();
       } catch (IOException | InterruptedException e) {
         e.printStackTrace();

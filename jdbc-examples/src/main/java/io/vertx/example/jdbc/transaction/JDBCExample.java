@@ -11,6 +11,7 @@ import io.vertx.ext.sql.SQLConnection;
 
 import java.io.IOException;
 
+import static io.vertx.example.util.DockerDbConfig.*;
 import static io.vertx.example.util.DockerDatabase.*;
 
 /*
@@ -28,7 +29,7 @@ public class JDBCExample extends AbstractVerticle {
 
     vertx.executeBlocking(future -> {
       try {
-        startDockerPostgres();
+        startDocker(POSTGRESQL);
         future.complete();
       } catch (IOException | InterruptedException e) {
         e.printStackTrace();
