@@ -27,6 +27,12 @@ import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
+import org.postgresql.Driver;
+
+import java.io.IOException;
+
+import static io.vertx.example.util.DockerDatabase.*;
+import static io.vertx.example.util.DockerDbConfig.POSTGRESQL;
 
 /**
  * @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
@@ -41,18 +47,26 @@ public class Server extends AbstractVerticle {
   private JDBCClient client;
 
   @Override
-  public void start() {
+  public void start() throws IOException, InterruptedException {
 
     Server that = this;
 
-    // Create a JDBC client with a test database
-    client = JDBCClient.createShared(vertx, new JsonObject()
-      .put("url", "jdbc:hsqldb:mem:test?shutdown=true")
-      .put("driver_class", "org.hsqldb.jdbcDriver"));
+    startDocker(POSTGRESQL);
+    JsonObject config = new JsonObject()
+      .put("jdbcUrl", "jdbc:postgresql://localhost:5432/" + dbName)
+      .put("driverClassName", "org.postgresql.Driver")
+      .put("principal", dbUser)
+      .put("credential", dbPassword);
+
+    try {
+      Class.forName("org.postgresql.Driver");
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+    this.client = JDBCClient.createShared(vertx, config);
 
     setUpInitialData(ready -> {
       Router router = Router.router(vertx);
-
       router.route().handler(BodyHandler.create());
 
       // in order to minimize the nesting of call backs we can put the JDBC connection on the context for all routes
@@ -87,6 +101,11 @@ public class Server extends AbstractVerticle {
 
       vertx.createHttpServer().requestHandler(router::accept).listen(8080);
     });
+  }
+
+  @Override
+  public void stop() throws IOException, InterruptedException {
+    stopDockerDatabase();
   }
 
   private void handleGetProduct(RoutingContext routingContext) {
@@ -154,7 +173,7 @@ public class Server extends AbstractVerticle {
 
       final SQLConnection conn = res.result();
 
-      conn.execute("CREATE TABLE IF NOT EXISTS products(id INT IDENTITY, name VARCHAR(255), price FLOAT, weight INT)", ddl -> {
+      conn.execute("CREATE TABLE IF NOT EXISTS products(id SERIAL PRIMARY KEY, name VARCHAR(255), price FLOAT, weight INT)", ddl -> {
         if (ddl.failed()) {
           throw new RuntimeException(ddl.cause());
         }

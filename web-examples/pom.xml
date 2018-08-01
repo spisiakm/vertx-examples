@@ -88,13 +88,11 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-infinispan</artifactId>
     </dependency>
-
     <dependency>
-      <groupId>org.hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <version>2.3.4</version>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.1</version>
     </dependency>
-
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-web-templ-handlebars</artifactId>
@@ -145,6 +143,8 @@
           <include>tls/server-key.pem</include>
           <include>petstore.yaml</include>
           <include>coin.png</include>
+          <include>vertx-users.properties</include>
+          <include>vertx-default-jul-logging.properties</include>
         </includes>
       </resource>
     </resources>

@@ -4,11 +4,13 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonObject;
 import io.vertx.example.util.Runner;
 import io.vertx.ext.auth.AuthProvider;
-import io.vertx.ext.auth.shiro.ShiroAuth;
+import io.vertx.ext.auth.shiro.ShiroAuthOptions;
 import io.vertx.ext.auth.shiro.ShiroAuthRealmType;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.*;
 import io.vertx.ext.web.sstore.LocalSessionStore;
+
+import static io.vertx.example.util.DockerDatabase.stopDockerDatabase;
 
 /*
  * @author <a href="http://tfox.org">Tim Fox</a>
@@ -31,7 +33,7 @@ public class Server extends AbstractVerticle {
     router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
 
     // Simple auth service which uses a properties file for user/role info
-    AuthProvider authProvider = ShiroAuth.create(vertx, ShiroAuthRealmType.PROPERTIES, new JsonObject());
+    AuthProvider authProvider = new ShiroAuthOptions().setType(ShiroAuthRealmType.PROPERTIES).setConfig(new JsonObject().put("properties_path", "vertx-users.properties")).createProvider(vertx);
 
     // We need a user session handler too to make sure the user is stored in the session between requests
     router.route().handler(UserSessionHandler.create(authProvider));
@@ -56,6 +58,12 @@ public class Server extends AbstractVerticle {
     router.route().handler(StaticHandler.create());
 
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
+  }
+
+  @Override
+  public void stop() throws Exception {
+    stopDockerDatabase();
+    super.stop();
   }
 }
 
