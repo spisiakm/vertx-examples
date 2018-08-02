@@ -20,87 +20,32 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.vertx</groupId>
+  <parent>
+    <groupId>io.vertx</groupId>
+    <artifactId>vertx-examples</artifactId>
+    <version>3.5.1.redhat-004</version>
+  </parent>
+
   <artifactId>http2-fatjar</artifactId>
-  <version>3.5.2</version>
 
   <name>HTTP/2 fatjar</name>
 
-  <dependencies>
+  <properties>
+    <vertx.skip>false</vertx.skip>
+    <vertx.verticle>io.vertx.example.fatjar.http2.Server</vertx.verticle>
+  </properties>
 
+  <dependencies>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-tcnative-boringssl-static</artifactId>
-      <version>2.0.7.Final</version>
+      <version>2.0.8.Final</version>
+      <scope>compile</scope>
     </dependency>
-
   </dependencies>
-
-  <build>
-
-    <pluginManagement>
-      <plugins>
-        <!-- We specify the Maven compiler plugin as we need to set it to Java 1.8 -->
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
-          <configuration>
-            <source>1.8</source>
-            <target>1.8</target>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
-    <plugins>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>2.3</version>
-        <executions>
-          <!-- Run shade goal on package phase -->
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <manifestEntries>
-                    <Main-Class>io.vertx.core.Launcher</Main-Class>
-                    <Main-Verticle>io.vertx.example.fatjar.http2.Server</Main-Verticle>
-                  </manifestEntries>
-                </transformer>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                  <resource>META-INF/services/io.vertx.core.spi.VerticleFactory</resource>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
-  <profiles>
-    <profile>
-      <id>staging</id>
-      <repositories>
-        <repository>
-          <id>staging</id>
-          <url>https://oss.sonatype.org/content/repositories/iovertx-3776/</url>
-        </repository>
-      </repositories>
-    </profile>
-  </profiles>
-
 </project>
