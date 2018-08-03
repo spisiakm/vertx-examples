@@ -35,10 +35,4 @@ public class Server extends AbstractVerticle {
       }
     });
   }
-
-  @Override
-  public void stop() throws Exception {
-    super.stop();
-    System.out.println("SHUTTING DOWN");
-  }
 }
