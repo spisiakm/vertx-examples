@@ -16,12 +16,18 @@ public class DockerDatabase {
   public static final String dbName = "my_data";
 
   public static void stopDockerDatabase() throws IOException, InterruptedException {
+    stopDockerDatabase(false);
+  }
+
+  public static void stopDockerDatabase(Boolean beforeInit) throws IOException, InterruptedException {
     ProcessBuilder processBuilder = new ProcessBuilder("docker", "rm", dockerAppName, "-f");
     Process process = processBuilder.start();
     if (process.waitFor(1, TimeUnit.MINUTES) && process.exitValue() == 0) {
-      System.out.println((char) 27 + "[32mA postgres database has been stopped successfully." + (char) 27 + "[0m");
+      if (!beforeInit) System.out.println((char) 27 + "[32mA postgres database has been stopped successfully." + (char) 27 + "[0m");
+      else System.out.println("Database container shutdown before init successful.");
     } else {
-      System.err.println((char) 27 + "[31mPostgres database shutdown has failed!" + (char) 27 + "[0m");
+      if (!beforeInit) System.err.println((char) 27 + "[31mPostgres database shutdown has failed!" + (char) 27 + "[0m");
+      else System.out.println("Database shutdown unsuccessful, the database container probably doesn't exist.");
     }
   }
 

@@ -28,7 +28,7 @@ public class JDBCExample extends AbstractVerticle {
 
     vertx.executeBlocking(future -> {
       try {
-        stopDockerDatabase();
+        stopDockerDatabase(true);
         startDockerPostgres();
         future.complete();
       } catch (IOException | InterruptedException e) {
