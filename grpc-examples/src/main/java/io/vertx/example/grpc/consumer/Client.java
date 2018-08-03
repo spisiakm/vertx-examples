@@ -6,7 +6,6 @@ import io.vertx.example.grpc.ConsumerServiceGrpc;
 import io.vertx.example.grpc.Messages;
 import io.vertx.example.util.Runner;
 import io.vertx.grpc.VertxChannelBuilder;
-import java.nio.charset.Charset;
 
 /*
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
@@ -40,7 +39,7 @@ public class Client extends AbstractVerticle {
     stub.streamingOutputCall(request, stream -> {
       stream.handler(response -> {
         System.out
-          .println(new String(response.getPayload().toByteArray(), Charset.forName("UTF-8")));
+          .println(response.getPayload().getBody().toStringUtf8());
       }).endHandler(v -> {
         System.out.println("Response has ended.");
       });

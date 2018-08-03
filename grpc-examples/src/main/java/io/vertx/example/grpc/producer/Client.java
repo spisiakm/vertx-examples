@@ -1,11 +1,14 @@
 package io.vertx.example.grpc.producer;
 
+import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.example.grpc.Messages;
 import io.vertx.example.grpc.ProducerServiceGrpc;
 import io.vertx.example.util.Runner;
 import io.vertx.grpc.VertxChannelBuilder;
+
+import java.nio.charset.Charset;
 
 /*
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
@@ -41,7 +44,12 @@ public class Client extends AbstractVerticle {
         });
 
       for (int i = 0; i < 10; i++) {
-        exchange.write(Messages.StreamingInputCallRequest.newBuilder().build());
+        exchange.write(Messages.StreamingInputCallRequest.newBuilder().setPayload(
+          Messages.Payload.newBuilder()
+            .setTypeValue(Messages.PayloadType.COMPRESSABLE.getNumber())
+            .setBody(ByteString.copyFrom(
+              String.valueOf(i), Charset.forName("UTF-8")))
+        ).build());
       }
 
       exchange.end();
