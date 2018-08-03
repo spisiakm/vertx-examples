@@ -135,6 +135,7 @@
 
   </dependencies>
   <build>
+
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -145,6 +146,8 @@
           <include>coin.png</include>
           <include>vertx-users.properties</include>
           <include>vertx-default-jul-logging.properties</include>
+          <include>keystore.jceks</include>
+          <include>custom_authorisation/webroot/index.html</include>
         </includes>
       </resource>
     </resources>
