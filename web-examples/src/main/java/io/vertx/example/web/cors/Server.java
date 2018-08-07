@@ -42,7 +42,7 @@ public class Server extends AbstractVerticle {
     allowedMethods.add(HttpMethod.POST);
     allowedMethods.add(HttpMethod.OPTIONS);
     /*
-     * these methods aren't necessary for this sample, 
+     * these methods aren't necessary for this sample,
      * but you may need them for your projects
      */
     allowedMethods.add(HttpMethod.DELETE);
@@ -76,7 +76,7 @@ public class Server extends AbstractVerticle {
     });
 
     // Serve the static resources
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("cors/webroot"));
 
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
   }

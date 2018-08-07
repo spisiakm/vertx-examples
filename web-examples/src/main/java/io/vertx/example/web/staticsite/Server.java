@@ -47,7 +47,7 @@ public class Server extends AbstractVerticle {
     Router router = Router.router(vertx);
 
     // Serve the static pages
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("staticsite/webroot"));
 
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
 

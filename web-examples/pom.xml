@@ -132,25 +132,78 @@
       <artifactId>slf4j-jdk14</artifactId>
       <version>${slf4j.version}</version>
     </dependency>
-
   </dependencies>
-  <build>
 
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>tls/server-cert.pem</include>
-          <include>tls/server-key.pem</include>
-          <include>petstore.yaml</include>
-          <include>coin.png</include>
-          <include>vertx-users.properties</include>
-          <include>vertx-default-jul-logging.properties</include>
-          <include>keystore.jceks</include>
-          <include>custom_authorisation/webroot/index.html</include>
-        </includes>
-      </resource>
-    </resources>
+  <build>
+    <plugins>
+      <!-- TODO look if is possible to install and use only one node and npm -->
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.6</version>
+        <configuration>
+          <workingDirectory>src/main/resources/react</workingDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install node and npm into react example</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <configuration>
+              <nodeVersion>v10.0.0</nodeVersion>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm install in react example</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>webpack build in react example</id>
+            <goals>
+              <goal>webpack</goal>
+            </goals>
+            <configuration>
+              <arguments>-p</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>install node and npm into vertxbus.amd example</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <configuration>
+              <nodeVersion>v10.0.0</nodeVersion>
+              <workingDirectory>src/main/resources/vertxbus/amd/webroot</workingDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>install bower locally into vertxbus.amd example</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>install bower</arguments>
+              <workingDirectory>src/main/resources/vertxbus/amd/webroot</workingDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>bower install in vertxbus.amd example</id>
+            <goals>
+              <goal>bower</goal>
+            </goals>
+            <configuration>
+              <arguments>install</arguments>
+              <workingDirectory>src/main/resources/vertxbus/amd/webroot</workingDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
   </build>
+
 
 </project>

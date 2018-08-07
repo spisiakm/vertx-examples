@@ -48,7 +48,7 @@ public class Server extends AbstractVerticle {
       ctx.put("seasons", seasons);
 
       // and now delegate to the engine to render it.
-      engine.render(ctx, "templates/index.hbs", res -> {
+      engine.render(ctx, "templating/handlebars/templates/index.hbs", res -> {
         if (res.succeeded()) {
           ctx.response().end(res.result());
         } else {

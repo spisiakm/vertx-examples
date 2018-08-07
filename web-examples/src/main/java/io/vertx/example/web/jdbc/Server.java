@@ -106,6 +106,7 @@ public class Server extends AbstractVerticle {
   @Override
   public void stop() throws IOException, InterruptedException {
     stopDockerDatabase();
+    this.stop();
   }
 
   private void handleGetProduct(RoutingContext routingContext) {

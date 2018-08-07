@@ -10,6 +10,8 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.*;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 
+import java.io.File;
+
 import static io.vertx.example.util.DockerDatabase.stopDockerDatabase;
 
 /*
@@ -33,7 +35,8 @@ public class Server extends AbstractVerticle {
     router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
 
     // Simple auth service which uses a properties file for user/role info
-    AuthProvider authProvider = new ShiroAuthOptions().setType(ShiroAuthRealmType.PROPERTIES).setConfig(new JsonObject().put("properties_path", "vertx-users.properties")).createProvider(vertx);
+    JsonObject config = new JsonObject().put("properties_path", "classpath:vertx-users.properties");
+    AuthProvider authProvider = new ShiroAuthOptions().setType(ShiroAuthRealmType.PROPERTIES).setConfig(config).createProvider(vertx);
 
     // We need a user session handler too to make sure the user is stored in the session between requests
     router.route().handler(UserSessionHandler.create(authProvider));
@@ -42,7 +45,7 @@ public class Server extends AbstractVerticle {
     router.route("/private/*").handler(RedirectAuthHandler.create(authProvider, "/loginpage.html"));
 
     // Serve the static private pages from directory 'private'
-    router.route("/private/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("private"));
+    router.route("/private/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("auth/private"));
 
     // Handles the actual login
     router.route("/loginhandler").handler(FormLoginHandler.create(authProvider));
@@ -55,7 +58,7 @@ public class Server extends AbstractVerticle {
     });
 
     // Serve the non private static pages
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("auth/webroot"));
 
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
   }

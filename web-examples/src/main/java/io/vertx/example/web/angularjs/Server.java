@@ -15,6 +15,8 @@ import io.vertx.ext.web.handler.StaticHandler;
 import java.util.LinkedList;
 import java.util.List;
 
+import static io.vertx.example.util.DockerDatabase.stopDockerDatabase;
+
 /*
  * @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
  */
@@ -182,7 +184,7 @@ public class Server extends AbstractVerticle {
     });
 
     // Create a router endpoint for the static content.
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("angularjs/webroot"));
 
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
   }
@@ -213,5 +215,11 @@ public class Server extends AbstractVerticle {
         });
       }
     });
+  }
+
+  @Override
+  public void stop() throws Exception {
+    stopDockerDatabase();
+    super.stop();
   }
 }

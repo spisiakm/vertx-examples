@@ -13,6 +13,11 @@ import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.templ.JadeTemplateEngine;
 
+import java.util.Collections;
+import java.util.Properties;
+
+import static io.vertx.example.util.DockerDatabase.stopDockerDatabase;
+
 /**
  * This is an example application to showcase the usage of MongDB and Vert.x Web.
  *
@@ -57,7 +62,7 @@ public class Server extends AbstractVerticle {
       ctx.put("title", "Vert.x Web");
 
       // and now delegate to the engine to render it.
-      jade.render(ctx, "templates/index", res -> {
+      jade.render(ctx, "mongo/templates/index", res -> {
         if (res.succeeded()) {
           ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/html").end(res.result());
         } else {
@@ -133,9 +138,15 @@ public class Server extends AbstractVerticle {
     });
 
     // Serve the non private static pages
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("mongo/webroot"));
 
     // start a HTTP web server on port 8080
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
+  }
+
+  @Override
+  public void stop() throws Exception {
+    stopDockerDatabase();
+    super.stop();
   }
 }

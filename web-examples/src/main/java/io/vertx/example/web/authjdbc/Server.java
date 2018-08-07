@@ -27,14 +27,7 @@ public class Server extends AbstractVerticle {
   public static final String AUTHENTICATION_QUERY = "SELECT PASSWORD, PASSWORD_SALT FROM \"user\" WHERE USERNAME = ?";
 
   // Convenience method so you can run it in your IDE
-  public static void main(String[] args) throws IOException, InterruptedException {
-    Runner.runExample(Server.class);
-    Scanner sc = new Scanner(System.in);
-    System.out.println("Press any key to stop application and postgres db");
-    sc.nextLine();
-    stopDockerDatabase();
-
-  }
+  public static void main(String[] args) { Runner.runExample(Server.class); }
 
   @Override
   public void start() throws Exception {
@@ -83,7 +76,7 @@ public class Server extends AbstractVerticle {
     router.route("/private/*").handler(RedirectAuthHandler.create(authProvider, "/loginpage.html"));
 
     // Serve the static private pages from directory 'private'
-    router.route("/private/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("private"));
+    router.route("/private/*").handler(StaticHandler.create().setCachingEnabled(false).setWebRoot("authjdbc/private"));
 
     // Handles the actual login
     router.route("/loginhandler").handler(FormLoginHandler.create(authProvider));
@@ -96,12 +89,12 @@ public class Server extends AbstractVerticle {
     });
 
     // Serve the non private static pages
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("authjdbc/webroot"));
 
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
 
   }
-  private void setUpInitialData(JDBCClient client) throws SQLException {
+  private void setUpInitialData(JDBCClient client) {
     client.getConnection(sqlConnectionAsyncResult -> {
       if(sqlConnectionAsyncResult.succeeded()){
 

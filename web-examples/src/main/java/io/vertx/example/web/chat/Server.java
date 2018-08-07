@@ -43,7 +43,7 @@ public class Server extends AbstractVerticle {
     router.route("/eventbus/*").handler(ebHandler);
 
     // Create a router endpoint for the static content.
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("chat/webroot"));
 
     // Start the web server and tell it to use the router to handle requests.
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
