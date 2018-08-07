@@ -49,9 +49,9 @@ public class Server extends AbstractVerticle {
   @Override
   public void start() throws IOException, InterruptedException {
 
-    Server that = this;
-
     startDocker(POSTGRESQL);
+
+    Server that = this;
     JsonObject config = new JsonObject()
       .put("jdbcUrl", "jdbc:postgresql://localhost:5432/" + dbName)
       .put("driverClassName", "org.postgresql.Driver")
@@ -104,9 +104,9 @@ public class Server extends AbstractVerticle {
   }
 
   @Override
-  public void stop() throws IOException, InterruptedException {
+  public void stop() throws Exception {
     stopDockerDatabase();
-    this.stop();
+    super.stop();
   }
 
   private void handleGetProduct(RoutingContext routingContext) {
@@ -142,6 +142,7 @@ public class Server extends AbstractVerticle {
         if (query.failed()) {
           sendError(500, response);
         } else {
+          response.putHeader("content-type", "application/json");
           response.end();
         }
       });
