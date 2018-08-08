@@ -54,7 +54,7 @@ public class Client extends AbstractVerticle {
           s -> mqttClient.disconnect(d -> System.out.println("Disconnected from server")));
       } else {
         System.out.println("Failed to connect to a server");
-        System.out.println(ch.cause());
+        ch.cause().printStackTrace();
       }
     });
   }

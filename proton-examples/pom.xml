@@ -5,12 +5,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.vertx</groupId>
     <artifactId>vertx-examples</artifactId>
+    <groupId>io.vertx</groupId>
     <version>3.5.1.redhat-004</version>
   </parent>
 
-  <artifactId>mqtt-examples</artifactId>
+  <artifactId>proton-examples</artifactId>
 
   <properties>
     <vertx.skip>false</vertx.skip>
@@ -19,7 +19,19 @@
   <dependencies>
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-mqtt</artifactId>
+      <artifactId>vertx-proton</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-rx-java2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-config</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-web</artifactId>
     </dependency>
   </dependencies>
 </project>
