@@ -23,7 +23,6 @@
     <module>core-examples</module>
     <module>web-examples</module>
     <module>web-client-examples</module>
-    <module>rxjava-1-examples</module>
     <module>rxjava-2-examples</module>
     <module>examples-utils</module>
     <module>unit-examples</module>
@@ -47,7 +46,6 @@
     <module>fatjar-examples/http2-fatjar</module>
     <module>camel-bridge-examples</module>
     <module>osgi-examples</module>
-    <module>resteasy-examples</module>
     <module>circuit-breaker-examples</module>
     <module>service-discovery-examples</module>
     <module>mqtt-examples</module>
@@ -56,6 +54,7 @@
     <module>kotlin-examples/coroutines</module>
     <module>junit5-examples</module>
     <module>zookeeper-examples</module>
+    <module>proton-examples</module>
   </modules>
 
   <dependencyManagement>
