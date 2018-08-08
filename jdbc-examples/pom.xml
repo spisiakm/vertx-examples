@@ -36,7 +36,6 @@
       <groupId>io.vertx</groupId>
       <artifactId>examples-utils</artifactId>
       <version>3.5.2</version>
-      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>
