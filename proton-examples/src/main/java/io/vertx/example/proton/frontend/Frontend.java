@@ -2,6 +2,7 @@ package io.vertx.example.proton.frontend;
 
 import io.reactivex.Completable;
 import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -43,6 +44,10 @@ public class Frontend extends AbstractVerticle {
   private final AtomicInteger requestSequence = new AtomicInteger(0);
   private final Queue<Message> requestMessages = new ConcurrentLinkedQueue<>();
   private final Data data = new Data();
+
+  public static void main(String[] args) {
+    Vertx.vertx().deployVerticle(Frontend.class.getName());
+  }
 
   @Override
   public void start(Future<Void> future) {
