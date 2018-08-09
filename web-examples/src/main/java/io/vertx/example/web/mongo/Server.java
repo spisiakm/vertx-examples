@@ -4,12 +4,19 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.example.util.DockerDatabase;
+import io.vertx.example.util.DockerDbConfig;
 import io.vertx.example.util.Runner;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.templ.JadeTemplateEngine;
+
+import java.util.Collections;
+import java.util.Properties;
+
+import static io.vertx.example.util.DockerDatabase.stopDockerDatabase;
 
 /**
  * This is an example application to showcase the usage of MongDB and Vert.x Web.
@@ -34,8 +41,10 @@ public class Server extends AbstractVerticle {
   @Override
   public void start() throws Exception {
 
-    // Create a mongo client using all defaults (connect to localhost and default port) using the database name "demo".
-    final MongoClient mongo = MongoClient.createShared(vertx, new JsonObject().put("db_name", "demo"));
+    DockerDatabase.startDocker(DockerDbConfig.MONGODB);
+
+    // Create a mongo client using all defaults (connect to localhost and default port) using the database name "my_data".
+    final MongoClient mongo = MongoClient.createShared(vertx, new JsonObject().put("db_name", "my_data"));
 
     // In order to use a JADE template we first need to create an engine
     final JadeTemplateEngine jade = JadeTemplateEngine.create();
@@ -53,7 +62,7 @@ public class Server extends AbstractVerticle {
       ctx.put("title", "Vert.x Web");
 
       // and now delegate to the engine to render it.
-      jade.render(ctx, "templates/index", res -> {
+      jade.render(ctx, "mongo/templates/index", res -> {
         if (res.succeeded()) {
           ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/html").end(res.result());
         } else {
@@ -129,9 +138,15 @@ public class Server extends AbstractVerticle {
     });
 
     // Serve the non private static pages
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("mongo/webroot"));
 
     // start a HTTP web server on port 8080
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
+  }
+
+  @Override
+  public void stop() throws Exception {
+    stopDockerDatabase();
+    super.stop();
   }
 }

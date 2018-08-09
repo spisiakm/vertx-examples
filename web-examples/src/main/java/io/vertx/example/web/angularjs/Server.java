@@ -4,6 +4,8 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.example.util.DockerDatabase;
+import io.vertx.example.util.DockerDbConfig;
 import io.vertx.example.util.Runner;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.Router;
@@ -12,6 +14,8 @@ import io.vertx.ext.web.handler.StaticHandler;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static io.vertx.example.util.DockerDatabase.stopDockerDatabase;
 
 /*
  * @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
@@ -28,8 +32,10 @@ public class Server extends AbstractVerticle {
   @Override
   public void start() throws Exception {
 
-    // Create a mongo client using all defaults (connect to localhost and default port) using the database name "demo".
-    mongo = MongoClient.createShared(vertx, new JsonObject().put("db_name", "demo"));
+    DockerDatabase.startDocker(DockerDbConfig.MONGODB);
+
+    // Create a mongo client using all defaults (connect to localhost and default port) using the database name "my_data".
+    mongo = MongoClient.createShared(vertx, new JsonObject().put("db_name", "my_data"));
 
     // the load function just populates some data on the storage
     loadData(mongo);
@@ -178,7 +184,7 @@ public class Server extends AbstractVerticle {
     });
 
     // Create a router endpoint for the static content.
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("angularjs/webroot"));
 
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
   }
@@ -209,5 +215,11 @@ public class Server extends AbstractVerticle {
         });
       }
     });
+  }
+
+  @Override
+  public void stop() throws Exception {
+    stopDockerDatabase();
+    super.stop();
   }
 }

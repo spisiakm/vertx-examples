@@ -46,7 +46,7 @@ public class Server extends AbstractVerticle {
     });
 
     // Serve the non private static pages
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("jwt/webroot"));
 
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
   }

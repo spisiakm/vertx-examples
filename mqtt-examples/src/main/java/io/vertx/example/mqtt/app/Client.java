@@ -45,7 +45,7 @@ public class Client extends AbstractVerticle {
   public void start() throws Exception {
     MqttClientOptions options = new MqttClientOptions().setKeepAliveTimeSeconds(2);
 
-    MqttClient client = MqttClient.create(Vertx.vertx(), options);
+    MqttClient client = MqttClient.create(vertx, options);
 
 
     // handler will be called when we have a message in topic we subscribing for
@@ -86,7 +86,7 @@ public class Client extends AbstractVerticle {
         client.subscribe(MQTT_TOPIC, 0);
       } else {
         System.out.println("Failed to connect to a server");
-        System.out.println(ch.cause());
+        ch.cause().printStackTrace();
       }
     });
   }

@@ -10,8 +10,6 @@ import io.vertx.grpc.GrpcReadStream;
 import io.vertx.grpc.VertxServer;
 import io.vertx.grpc.VertxServerBuilder;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /*
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
@@ -30,7 +28,7 @@ public class Server extends AbstractVerticle {
       @Override
       public void streamingInputCall(GrpcReadStream<Messages.StreamingInputCallRequest> request, Future<Messages.StreamingInputCallResponse> future) {
         request.handler(payload -> {
-          System.out.println(payload.getPayload().getType().getNumber());
+          System.out.println(payload.getPayload().getBody().toStringUtf8());
         }).endHandler(v -> {
           System.out.println("Request has ended.");
           future.complete(Messages.StreamingInputCallResponse.newBuilder().build());

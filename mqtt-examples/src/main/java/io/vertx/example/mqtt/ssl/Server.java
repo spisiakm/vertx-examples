@@ -39,8 +39,8 @@ public class Server extends AbstractVerticle {
     MqttServerOptions options = new MqttServerOptions()
       .setPort(8883)
       .setPemKeyCertOptions(new PemKeyCertOptions()
-        .setKeyPath("server-key.pem")
-        .setCertPath("server-cert.pem"))
+        .setKeyPath("certs/server-key.pem")
+        .setCertPath("certs/server-cert.pem"))
       .setSsl(true);
 
     MqttServer mqttServer = MqttServer.create(vertx, options);

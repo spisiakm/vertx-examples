@@ -39,7 +39,7 @@ public class Server extends AbstractVerticle {
       ctx.put("name", "Vert.x Web");
 
       // and now delegate to the engine to render it.
-      engine.render(ctx, "templates/index.jade", res -> {
+      engine.render(ctx, "templating/jade/templates/index.jade", res -> {
         if (res.succeeded()) {
           ctx.response().end(res.result());
         } else {

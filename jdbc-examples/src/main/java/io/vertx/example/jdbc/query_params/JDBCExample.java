@@ -1,13 +1,16 @@
 package io.vertx.example.jdbc.query_params;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.example.util.Runner;
 import io.vertx.ext.jdbc.JDBCClient;
-import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
+
+import java.io.IOException;
+
+import static io.vertx.example.util.DockerDbConfig.*;
+import static io.vertx.example.util.DockerDatabase.*;
 
 /*
  * @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
@@ -20,54 +23,73 @@ public class JDBCExample extends AbstractVerticle {
   }
 
   @Override
-  public void start() throws Exception {
+  public void start() {
 
-    final JDBCClient client = JDBCClient.createShared(vertx, new JsonObject()
-        .put("url", "jdbc:hsqldb:mem:test?shutdown=true")
-        .put("driver_class", "org.hsqldb.jdbcDriver")
-        .put("max_pool_size", 30)
-        .put("user", "SA")
-        .put("password", ""));
-
-    client.getConnection(conn -> {
-      if (conn.failed()) {
-        System.err.println(conn.cause().getMessage());
-        return;
+    vertx.executeBlocking(future -> {
+      try {
+        startDocker(POSTGRESQL);
+        future.complete();
+      } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
+        future.fail(e);
       }
-      final SQLConnection connection = conn.result();
+    }, result -> {
+      if (result.succeeded()) {
+        JsonObject config = new JsonObject()
+          .put("jdbcUrl", "jdbc:postgresql://localhost:5432/" + dbName)
+          .put("driverClassName", "org.postgresql.Driver")
+          .put("principal", dbUser)
+          .put("credential", dbPassword);
 
-      // create a test table
-      connection.execute("create table test(id int primary key, name varchar(255))", create -> {
-        if (create.failed()) {
-          System.err.println("Cannot create the table");
-          create.cause().printStackTrace();
-          return;
-        }
+        final JDBCClient client = JDBCClient.createShared(vertx, config);
 
-        // insert some test data
-        connection.execute("insert into test values (1, 'Hello'), (2, 'World')", insert -> {
+        client.getConnection(conn -> {
+          if (conn.failed()) {
+            System.err.println(conn.cause().getMessage());
+            return;
+          }
+          final SQLConnection connection = conn.result();
 
-          // query some data with arguments
-          connection.queryWithParams("select * from test where id = ?", new JsonArray().add(2), rs -> {
-            if (rs.failed()) {
-              System.err.println("Cannot retrieve the data from the database");
-              rs.cause().printStackTrace();
+          // create a test table
+          connection.execute("create table test(id int primary key, name varchar(255))", create -> {
+            if (create.failed()) {
+              System.err.println("Cannot create the table");
+              create.cause().printStackTrace();
               return;
             }
 
-            for (JsonArray line : rs.result().getResults()) {
-              System.out.println(line.encode());
-            }
+            // insert some test data
+            connection.execute("insert into test values (1, 'Hello'), (2, 'World')", insert -> {
 
-            // and close the connection
-            connection.close(done -> {
-              if (done.failed()) {
-                throw new RuntimeException(done.cause());
-              }
+              // query some data with arguments
+              connection.queryWithParams("select * from test where id = ?", new JsonArray().add(2), rs -> {
+                if (rs.failed()) {
+                  System.err.println("Cannot retrieve the data from the database");
+                  rs.cause().printStackTrace();
+                  return;
+                }
+
+                for (JsonArray line : rs.result().getResults()) {
+                  System.out.println(line.encode());
+                }
+
+                // and close the connection
+                connection.close(done -> {
+                  if (done.failed()) {
+                    throw new RuntimeException(done.cause());
+                  }
+
+                  try {
+                    stopDockerDatabase();
+                  } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                  }
+                });
+              });
             });
           });
         });
-      });
+      }
     });
   }
 }

@@ -9,6 +9,11 @@ import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 
+import java.io.IOException;
+
+import static io.vertx.example.util.DockerDbConfig.*;
+import static io.vertx.example.util.DockerDatabase.*;
+
 /*
  * @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
  */
@@ -22,44 +27,63 @@ public class JDBCExample extends AbstractVerticle {
   @Override
   public void start() throws Exception {
 
-    final JDBCClient client = JDBCClient.createShared(vertx, new JsonObject()
-        .put("url", "jdbc:hsqldb:mem:test?shutdown=true")
-        .put("driver_class", "org.hsqldb.jdbcDriver")
-        .put("max_pool_size", 30)
-        .put("user", "SA")
-        .put("password", ""));
-
-    client.getConnection(conn -> {
-      if (conn.failed()) {
-        System.err.println(conn.cause().getMessage());
-        return;
+    vertx.executeBlocking(future -> {
+      try {
+        startDocker(POSTGRESQL);
+        future.complete();
+      } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
+        future.fail(e);
       }
+    }, result -> {
+      if (result.succeeded()) {
+        JsonObject config = new JsonObject()
+          .put("jdbcUrl", "jdbc:postgresql://localhost:5432/" + dbName)
+          .put("driverClassName", "org.postgresql.Driver")
+          .put("principal", dbUser)
+          .put("credential", dbPassword);
 
-      // create a test table
-      execute(conn.result(), "create table test(id int primary key, name varchar(255))", create -> {
-        // start a transaction
-        startTx(conn.result(), beginTrans -> {
-          // insert some test data
-          execute(conn.result(), "insert into test values(1, 'Hello')", insert -> {
-            // commit data
-            endTx(conn.result(), commitTrans -> {
-              // query some data
-              query(conn.result(), "select count(*) from test", rs -> {
-                for (JsonArray line : rs.getResults()) {
-                  System.out.println(line.encode());
-                }
+        final JDBCClient client = JDBCClient.createShared(vertx, config);
 
-                // and close the connection
-                conn.result().close(done -> {
-                  if (done.failed()) {
-                    throw new RuntimeException(done.cause());
-                  }
+        client.getConnection(conn -> {
+          if (conn.failed()) {
+            System.err.println(conn.cause().getMessage());
+            return;
+          }
+
+          // create a test table
+          execute(conn.result(), "create table test(id int primary key, name varchar(255))", create -> {
+            // start a transaction
+            startTx(conn.result(), beginTrans -> {
+              // insert some test data
+              execute(conn.result(), "insert into test values(1, 'Hello')", insert -> {
+                // commit data
+                endTx(conn.result(), commitTrans -> {
+                  // query some data
+                  query(conn.result(), "select count(*) from test", rs -> {
+                    for (JsonArray line : rs.getResults()) {
+                      System.out.println(line.encode());
+                    }
+
+                    // and close the connection
+                    conn.result().close(done -> {
+                      if (done.failed()) {
+                        throw new RuntimeException(done.cause());
+                      }
+
+                      try {
+                        stopDockerDatabase();
+                      } catch (IOException | InterruptedException e) {
+                        e.printStackTrace();
+                      }
+                    });
+                  });
                 });
               });
             });
           });
         });
-      });
+      }
     });
   }
 

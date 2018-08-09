@@ -9,6 +9,7 @@ import io.vertx.example.util.Runner;
 import io.vertx.grpc.GrpcWriteStream;
 import io.vertx.grpc.VertxServer;
 import io.vertx.grpc.VertxServerBuilder;
+
 import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -41,6 +42,11 @@ public class Server extends AbstractVerticle {
                 .setBody(ByteString.copyFrom(
                   String.valueOf(counter.incrementAndGet()), Charset.forName("UTF-8")))
             ).build());
+
+            if (counter.get() >= 10) {
+              vertx.cancelTimer(t);
+              response.end();
+            }
           });
         }
       };

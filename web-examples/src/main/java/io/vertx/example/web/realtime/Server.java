@@ -44,7 +44,7 @@ public class Server extends AbstractVerticle {
     }));
 
     // Serve the static resources
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("realtime/webroot"));
 
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
 
