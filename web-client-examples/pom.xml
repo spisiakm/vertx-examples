@@ -12,6 +12,10 @@
 
   <artifactId>web-client-examples</artifactId>
 
+  <properties>
+    <vertx.skip>false</vertx.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>io.vertx</groupId>
