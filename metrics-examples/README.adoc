@@ -59,10 +59,6 @@ Once defined, relaunch the application with the JMX metrics enabled.
 This example is a monitoring setup for Prometheus via Dropwizard metrics.
 
 The link:src/main/java/io/vertx/example/metrics/prometheus/[Java monitoring example]
-The link:src/main/groovy/io/vertx/example/metrics/prometheus/[Groovy monitoring example]
-The link:src/main/js/io/vertx/example/metrics/prometheus/[JavaScript monitoring example]
-The link:src/main/ruby/io/vertx/example/metrics/prometheus/[Ruby monitoring example]
-The link:src/main/kotlin/io/vertx/example/metrics/prometheus/[Kotlin monitoring example]
 
 The verticle uses Dropwizard metrics to register a Prometheus CollectorRegistry (in this
 case the defaultRegistry) which is bound to a router via MetricsHandler. To create some metrics
