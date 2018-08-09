@@ -38,7 +38,7 @@ public class Server extends AbstractVerticle {
       ctx.put("name", "Vert.x Web");
 
       // and now delegate to the engine to render it.
-      engine.render(ctx, "templates/index.peb", res -> {
+      engine.render(ctx, "templating/pebble/templates/index.peb", res -> {
         if (res.succeeded()) {
           ctx.response().end(res.result());
         } else {

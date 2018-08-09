@@ -37,12 +37,11 @@ public class Server extends AbstractVerticle {
   public void start() {
 
     Router router = Router.router(vertx);
-
     // Serve the dynamic pages
-    router.route("/dynamic/*").handler(TemplateHandler.create(MVELTemplateEngine.create()));
+    router.route("/dynamic/*").handler(TemplateHandler.create(MVELTemplateEngine.create(),"templating/mvel/templates",TemplateHandler.DEFAULT_CONTENT_TYPE));
 
     // Serve the static pages
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("templating/mvel/webroot"));
 
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
   }

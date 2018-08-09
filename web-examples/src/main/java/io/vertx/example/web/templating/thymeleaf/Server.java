@@ -39,7 +39,7 @@ public class Server extends AbstractVerticle {
       ctx.put("welcome", "Hi there!");
 
       // and now delegate to the engine to render it.
-      engine.render(ctx, "templates/index.html", res -> {
+      engine.render(ctx, "templating/thymeleaf/templates/index.html", res -> {
         if (res.succeeded()) {
           ctx.response().end(res.result());
         } else {

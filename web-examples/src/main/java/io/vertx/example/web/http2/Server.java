@@ -36,11 +36,15 @@ public class Server extends AbstractVerticle {
               .end(image.getPixel(Integer.parseInt(ctx.pathParam("x")), Integer.parseInt(ctx.pathParam("y"))));
     });
 
+    PemKeyCertOptions options = new PemKeyCertOptions();
+
+    options.setKeyPath("tls/server-key.pem");
+    options.setCertPath("tls/server-cert.pem");
     vertx.createHttpServer(
             new HttpServerOptions()
                     .setSsl(true)
                     .setUseAlpn(true)
-                    .setPemKeyCertOptions(new PemKeyCertOptions().setKeyPath("tls/server-key.pem").setCertPath("tls/server-cert.pem"))).requestHandler(router::accept)
+                    .setPemKeyCertOptions(options)).requestHandler(router::accept)
             .listen(8443);
   }
 }

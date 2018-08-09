@@ -5,9 +5,11 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.example.util.DockerDatabase;
+import io.vertx.example.util.DockerDbConfig;
 import io.vertx.example.util.Runner;
 import io.vertx.ext.auth.AuthProvider;
-import io.vertx.ext.auth.shiro.ShiroAuth;
+import io.vertx.ext.auth.shiro.ShiroAuthOptions;
 import io.vertx.ext.auth.shiro.ShiroAuthRealmType;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.Router;
@@ -19,6 +21,8 @@ import io.vertx.ext.web.sstore.LocalSessionStore;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static io.vertx.example.util.DockerDatabase.stopDockerDatabase;
 
 /*
  * @author <a href="mailto:pmlopes@gmail.com">Paulo Lopes</a>
@@ -34,9 +38,10 @@ public class Server extends AbstractVerticle {
 
   @Override
   public void start() throws Exception {
+    DockerDatabase.startDocker(DockerDbConfig.MONGODB);
 
-    // Create a mongo client using all defaults (connect to localhost and default port) using the database name "demo".
-    mongo = MongoClient.createShared(vertx, new JsonObject().put("db_name", "demo"));
+    // Create a mongo client using all defaults (connect to localhost and default port) using the database name "my_data".
+    mongo = MongoClient.createShared(vertx, new JsonObject().put("db_name", "my_data"));
 
     // the load function just populates some data on the storage
     loadData(mongo);
@@ -53,7 +58,8 @@ public class Server extends AbstractVerticle {
     router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
 
     // Simple auth service which uses a properties file for user/role info
-    AuthProvider authProvider = ShiroAuth.create(vertx, ShiroAuthRealmType.PROPERTIES, new JsonObject());
+    JsonObject config = new JsonObject().put("properties_path", "classpath:vertx-users.properties");
+    AuthProvider authProvider = new ShiroAuthOptions().setType(ShiroAuthRealmType.PROPERTIES).setConfig(config).createProvider(vertx);
 
     // We need a user session handler too to make sure the user is stored in the session between requests
     router.route().handler(UserSessionHandler.create(authProvider));
@@ -108,7 +114,7 @@ public class Server extends AbstractVerticle {
     router.route("/eventbus/*").handler(SockJSHandler.create(vertx).bridge(options));
 
     // Serve the static resources
-    router.route().handler(StaticHandler.create());
+    router.route().handler(StaticHandler.create("angular_realtime/webroot"));
 
     vertx.createHttpServer().requestHandler(router::accept).listen(8080);
   }
@@ -154,6 +160,7 @@ public class Server extends AbstractVerticle {
 
       List<JsonObject> albums = new LinkedList<>();
 
+
       albums.add(new JsonObject()
         .put("artist", "The Wurzels")
         .put("genre", "Scrumpy and Western")
@@ -181,9 +188,15 @@ public class Server extends AbstractVerticle {
 
       for (JsonObject album : albums) {
         db.insert("albums", album, res -> {
-          System.out.println("inserted " + album.encode());
+           System.out.println("inserted " + album.encode());
         });
       }
     });
+  }
+
+  @Override
+  public void stop() throws Exception {
+    stopDockerDatabase();
+    super.stop();
   }
 }
