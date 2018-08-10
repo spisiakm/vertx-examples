@@ -1,9 +1,12 @@
 package io.vertx.example.proton.frontend;
 
 import io.reactivex.Completable;
+import io.vertx.config.ConfigRetrieverOptions;
+import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.proton.ProtonClient;
@@ -40,6 +43,8 @@ public class Frontend extends AbstractVerticle {
 
   private ProtonSender requestSender;
   private ProtonReceiver responseReceiver;
+  private String stringFromConfig;
+  private int intFromConfig;
 
   private final AtomicInteger requestSequence = new AtomicInteger(0);
   private final Queue<Message> requestMessages = new ConcurrentLinkedQueue<>();
@@ -59,7 +64,7 @@ public class Frontend extends AbstractVerticle {
     router.get("/api/health").handler(rc -> rc.response().end("OK"));
     router.get("/*").handler(StaticHandler.create());
 
-    ConfigRetriever.create(vertx).rxGetConfig()
+    ConfigRetriever.create(vertx, initConfigStore()).rxGetConfig()
       .flatMapCompletable(json -> {
         String amqpHost = json.getString("MESSAGING_SERVICE_HOST", "localhost");
         int amqpPort = json.getInteger("MESSAGING_SERVICE_PORT", 5672);
@@ -68,6 +73,9 @@ public class Frontend extends AbstractVerticle {
 
         String httpHost = json.getString("HTTP_HOST", "0.0.0.0");
         int httpPort = json.getInteger("HTTP_PORT", 8080);
+
+        stringFromConfig = json.getString("stringExample");
+        intFromConfig = json.getInteger("intExample");
 
         // AMQP
         ProtonClient client = ProtonClient.create(vertx.getDelegate());
@@ -92,6 +100,9 @@ public class Frontend extends AbstractVerticle {
           .requestHandler(router::accept)
           .rxListen(httpPort, httpHost)
           .toCompletable();
+
+        System.out.println(stringFromConfig);
+        System.out.println(intFromConfig);
 
         return brokerConnected.andThen(serverStarted);
       })
@@ -235,5 +246,16 @@ public class Frontend extends AbstractVerticle {
         }
       }
     });
+  }
+
+  private ConfigRetrieverOptions initConfigStore() {
+    ConfigStoreOptions yamlFile = new ConfigStoreOptions()
+      .setType("file")
+      .setFormat("yaml")
+      .setConfig(new JsonObject()
+        .put("path", "configuration/my-config.yml")
+      );
+
+    return new ConfigRetrieverOptions().addStore(yamlFile);
   }
 }
