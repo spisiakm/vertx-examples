@@ -5,6 +5,9 @@ import io.vertx.example.util.Runner;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.ext.jdbc.JDBCClient;
 
+import static io.vertx.example.util.DockerDatabase.*;
+import static io.vertx.example.util.DockerDbConfig.POSTGRESQL;
+
 /*
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
@@ -18,8 +21,13 @@ public class Streaming extends AbstractVerticle {
   @Override
   public void start() throws Exception {
 
-    JsonObject config = new JsonObject().put("url", "jdbc:hsqldb:mem:test?shutdown=true")
-      .put("driver_class", "org.hsqldb.jdbcDriver");
+    startDocker(POSTGRESQL);
+
+    JsonObject config = new JsonObject()
+      .put("jdbcUrl", "jdbc:postgresql://localhost:5432/" + dbName)
+      .put("driverClassName", "org.postgresql.Driver")
+      .put("principal", dbUser)
+      .put("credential", dbPassword);
 
     JDBCClient jdbc = JDBCClient.createShared(vertx, config);
 
@@ -40,5 +48,11 @@ public class Streaming extends AbstractVerticle {
               });
           });
       }).subscribe(row -> System.out.println("Row : " + row.encode()));
+  }
+
+  @Override
+  public void stop() throws Exception {
+    stopDockerDatabase();
+    super.stop();
   }
 }

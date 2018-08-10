@@ -19,6 +19,7 @@ test-results
 test-tmp
 *.iml
 *.class
+**/src/main/generated
 src/gen
 src/main/groovy/io/vertx/groovy/core/**/*.groovy
 src/test/groovy/io/vertx/groovy/codegen/**/*.groovy
