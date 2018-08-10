@@ -1,11 +1,14 @@
 package io.vertx.example.reactivex.database.jdbc;
 
+import io.reactivex.Single;
 import io.vertx.core.json.JsonObject;
 import io.vertx.example.util.Runner;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.ext.jdbc.JDBCClient;
-import io.reactivex.Single;
+
+import static io.vertx.example.util.DockerDatabase.*;
+import static io.vertx.example.util.DockerDbConfig.POSTGRESQL;
 
 /*
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
@@ -20,8 +23,13 @@ public class Client extends AbstractVerticle {
   @Override
   public void start() throws Exception {
 
-    JsonObject config = new JsonObject().put("url", "jdbc:hsqldb:mem:test?shutdown=true")
-      .put("driver_class", "org.hsqldb.jdbcDriver");
+    startDocker(POSTGRESQL);
+
+    JsonObject config = new JsonObject()
+      .put("jdbcUrl", "jdbc:postgresql://localhost:5432/" + dbName)
+      .put("driverClassName", "org.postgresql.Driver")
+      .put("principal", dbUser)
+      .put("credential", dbPassword);
 
     JDBCClient jdbc = JDBCClient.createShared(vertx, config);
 
@@ -43,5 +51,11 @@ public class Client extends AbstractVerticle {
       System.out.println("Database problem");
       err.printStackTrace();
     });
+  }
+
+  @Override
+  public void stop() throws Exception {
+    stopDockerDatabase();
+    super.stop();
   }
 }
