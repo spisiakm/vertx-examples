@@ -26,7 +26,7 @@ public class Client extends AbstractVerticle {
       new WebClientOptions()
         .setSsl(true)
         .setTrustStoreOptions(new JksOptions()
-          .setPath("client-truststore.jks")
+          .setPath("https/client-truststore.jks")
           .setPassword("wibble")
         )
     );

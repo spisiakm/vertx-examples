@@ -20,7 +20,7 @@ public class Server extends AbstractVerticle {
 
     // Start an SSL/TLS http server
     vertx.createHttpServer(new HttpServerOptions().setKeyStoreOptions(new JksOptions()
-      .setPath("server-keystore.jks")
+      .setPath("https/server-keystore.jks")
       .setPassword("wibble"))
       .setSsl(true)
     ).requestHandler(req -> {
