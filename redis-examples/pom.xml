@@ -36,6 +36,14 @@
       <optional>true</optional>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/com.github.kstyrc/embedded-redis -->
+    <dependency>
+      <groupId>com.github.kstyrc</groupId>
+      <artifactId>embedded-redis</artifactId>
+      <version>0.6</version>
+      <scope>compile</scope>
+    </dependency>
+
   </dependencies>
 
 </project>
