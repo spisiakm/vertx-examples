@@ -83,6 +83,7 @@ public class ServiceDiscoveryVerticle extends AbstractVerticle {
 
     });
 
+    System.out.println("Success!");
     discovery.close();
   }
 }
