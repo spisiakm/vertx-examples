@@ -45,6 +45,7 @@
     <module>kafka-examples</module>
     <module>junit5-examples</module>
     <module>proton-examples</module>
+    <module>health-check-examples</module>
   </modules>
 
   <dependencyManagement>
