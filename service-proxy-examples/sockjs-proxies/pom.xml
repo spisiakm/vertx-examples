@@ -4,35 +4,36 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.vertx</groupId>
+  <parent>
+    <groupId>io.vertx</groupId>
+    <artifactId>service-proxy-examples</artifactId>
+    <version>3.5.1.redhat-004</version>
+  </parent>
+
   <artifactId>sockjs-proxies-examples</artifactId>
-  <version>3.5.2</version>
 
   <dependencies>
 
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-web</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>examples-utils</artifactId>
-      <version>${project.version}</version>
+      <version>3.5.2</version>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-sockjs-service-proxy</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
   </dependencies>

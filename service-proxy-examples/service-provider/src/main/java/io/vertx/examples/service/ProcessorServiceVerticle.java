@@ -6,9 +6,9 @@ import io.vertx.examples.service.utils.Runner;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
-import io.vertx.ext.web.handler.sockjs.PermittedOptions;
+import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
-import io.vertx.serviceproxy.ProxyHelper;
+import io.vertx.serviceproxy.ServiceBinder;
 
 /**
  * The verticle publishing the service.
@@ -18,7 +18,7 @@ public class ProcessorServiceVerticle extends AbstractVerticle {
   ProcessorService service;
 
   // Convenience method so you can run it in your IDE
-  public static void main(String[] args) {
+  public static void main(String[] args) throws ClassNotFoundException {
     Runner.runExample(ProcessorServiceVerticle.class);
   }
 
@@ -27,7 +27,8 @@ public class ProcessorServiceVerticle extends AbstractVerticle {
     // Create the client object
     service = new ProcessorServiceImpl();
     // Register the handler
-    ProxyHelper.registerService(ProcessorService.class, vertx, service, "vertx.processor");
+    ServiceBinder binder = new ServiceBinder(vertx);
+    binder.setAddress("vertx.processor").register(ProcessorService.class, new ProcessorServiceImpl());
 
     //
     Router router = Router.router(vertx);

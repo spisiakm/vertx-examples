@@ -7,8 +7,12 @@
   <parent>
     <artifactId>service-proxy-examples</artifactId>
     <groupId>io.vertx</groupId>
-    <version>3.5.2</version>
+    <version>3.5.1.redhat-004</version>
   </parent>
+
+  <properties>
+    <vertx.skip>false</vertx.skip>
+  </properties>
 
   <artifactId>service-consumer</artifactId>
 
@@ -17,13 +21,12 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>examples-utils</artifactId>
-      <version>${project.version}</version>
+      <version>3.5.2</version>
       <optional>true</optional>
     </dependency>
 
@@ -36,67 +39,13 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-service-factory</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-hazelcast</artifactId>
-      <version>${project.version}</version>
+      <artifactId>vertx-infinispan</artifactId>
     </dependency>
 
   </dependencies>
 
-  <build>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
-          <configuration>
-            <source>1.8</source>
-            <target>1.8</target>
-            <compilerArgs>
-              <arg>-Acodetrans.output=${project.basedir}/src/main</arg>
-            </compilerArgs>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>2.3</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <manifestEntries>
-                    <Main-Class>io.vertx.core.Launcher</Main-Class>
-                    <Main-Verticle>io.vertx.examples.service.consumer.ConsumerVerticle</Main-Verticle>
-                  </manifestEntries>
-                </transformer>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                  <resource>META-INF/services/io.vertx.core.spi.VerticleFactory</resource>
-                </transformer>
-              </transformers>
-              <artifactSet>
-              </artifactSet>
-              <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar</outputFile>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-    </plugins>
-
-  </build>
 </project>
