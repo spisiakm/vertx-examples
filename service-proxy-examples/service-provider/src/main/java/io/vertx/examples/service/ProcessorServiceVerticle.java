@@ -18,7 +18,7 @@ public class ProcessorServiceVerticle extends AbstractVerticle {
   ProcessorService service;
 
   // Convenience method so you can run it in your IDE
-  public static void main(String[] args) {
+  public static void main(String[] args) throws ClassNotFoundException {
     Runner.runExample(ProcessorServiceVerticle.class);
   }
 
