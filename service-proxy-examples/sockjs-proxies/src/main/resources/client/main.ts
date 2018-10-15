@@ -11,10 +11,11 @@ eb.onopen = () => {
   const myService = new MyService(eb, 'proxy.example');
 
   myService.sayHello('Paulo', (err, res) => {
+    var el = document.getElementById('text');
     if (err) {
-      alert('Error: ' + err);
+      el.innerText = 'Error: ' + err;
     } else {
-      alert(res);
+      el.innerText = res;
     }
   });
 };
